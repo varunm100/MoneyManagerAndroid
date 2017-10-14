@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "860307277334",
+    "firebase_url": "https://expmanage.firebaseio.com",
+    "project_id": "expmanage",
+    "storage_bucket": "expmanage.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:860307277334:android:9592d5e82b7cb362",
+        "android_client_info": {
+          "package_name": "com.example.meta_knight.moneymanagerdatabase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "860307277334-5ov13kvcua7o5eqncuahgm27oqaipng6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.meta_knight.moneymanagerdatabase",
+            "certificate_hash": "66148dbcc27f411763bad153dc638d13e4051a9a"
+          }
+        },
+        {
+          "client_id": "860307277334-nbuj102dm65lc2fskbg935epoh3hthka.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAP6Jkz6sSCuKKB0NOwXgrX0DQ_mC25KcI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "860307277334-nbuj102dm65lc2fskbg935epoh3hthka.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
