@@ -18,7 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".PersonDash">
+        <activity
+                android:name=".PersonDash"
+                android:label="@string/title_activity_person_dash"
+                android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

@@ -3,10 +3,17 @@ package com.example.meta_knight.moneymanagerdatabase;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -19,9 +26,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 
 public class PersonDash extends AppCompatActivity {
     private String email = null;
@@ -29,12 +35,17 @@ public class PersonDash extends AppCompatActivity {
     private String uid = null;
     private String PhotoURL = null;
 
+
+    private List<CompanyItem> companyList = new ArrayList<>();
+
+    private RecyclerView recyclerView;
+    private CompaniesAdapter mAdapter;
+    List <CompanyItem> CompList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_person_dash);
 
-        Bundle bundle = getIntent().getExtras();
+        /*Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             email = bundle.getString("email");
             name = bundle.getString("name");
@@ -44,7 +55,37 @@ public class PersonDash extends AppCompatActivity {
         } else {
             Toast.makeText(PersonDash.this, "Got Null Bundle", Toast.LENGTH_SHORT).show();
         }
-        UserExist(uid);
+        UserExist(uid);*/
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_person_dash);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        mAdapter = new CompaniesAdapter(CompList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+        ViewHelper();
+    }
+
+    private void ViewHelper() {
+        CompanyItem Company = new CompanyItem("VarTech","varunm100@gmail.com");
+        CompList.add(Company);
+        Company = new CompanyItem("Arkham Stations","batmansuper@gmail.com");
+        CompList.add(Company);
+        Company = new CompanyItem("VarTech","varunm100@gmail.com");
+        CompList.add(Company);
+        Company = new CompanyItem("Zebi","babu@zebi.co");
+        CompList.add(Company);
+        Company = new CompanyItem("Personal","varunm11111@gmail.com");
+        CompList.add(Company);
+        Log.wtf("CALLED","mAdapter NOT WORKING YAYA");
+        mAdapter.notifyDataSetChanged();
     }
 
     private void CreateUser(String UserId, String mailId, String UserName, String PhotURI) {
@@ -164,6 +205,7 @@ public class PersonDash extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 e.printStackTrace();
+                Toast.makeText(PersonDash.this, "Failed to Verify if document Exists", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -345,4 +387,5 @@ public class PersonDash extends AppCompatActivity {
         AlertDialog dialog = alert.create();
         dialog.show();
     }
+
 }

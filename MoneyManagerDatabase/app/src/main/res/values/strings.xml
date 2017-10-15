@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MoneyManagerDatabase</string>
+    <string name="title_activity_person_dash">PersonDash</string>
 </resources>
