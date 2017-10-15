@@ -17,17 +17,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.hash.Hashing;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.EventListener;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
 
 public class PersonDash extends AppCompatActivity {
     private String email = null;
@@ -36,16 +35,16 @@ public class PersonDash extends AppCompatActivity {
     private String PhotoURL = null;
 
 
-    private List<CompanyItem> companyList = new ArrayList<>();
-
+    private List<Movie> movieList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private CompaniesAdapter mAdapter;
-    List <CompanyItem> CompList = new ArrayList<>();
+    private MoviesAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_person_dash);
 
-        /*Bundle bundle = getIntent().getExtras();
+        Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             email = bundle.getString("email");
             name = bundle.getString("name");
@@ -55,36 +54,88 @@ public class PersonDash extends AppCompatActivity {
         } else {
             Toast.makeText(PersonDash.this, "Got Null Bundle", Toast.LENGTH_SHORT).show();
         }
-        UserExist(uid);*/
+        UserExist(uid);
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_person_dash);
+        InitializeContentView();
+        AddSnapListener();
+    }
 
+    private void AddSnapListener() {
+        CollectionReference mDocCompanies = FirebaseFirestore.getInstance().collection("users/" + uid + "/companies");
+        mDocCompanies.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                List<DocumentSnapshot> DocSnapshotVec = documentSnapshots.getDocuments();
+                Movie TempMovie = null;
+                List<Movie> TempCompanyList = new ArrayList<>();
+                movieList.clear();
+                for (DocumentSnapshot i : DocSnapshotVec) {
+                    if (i.getString("cid") != "null") {
+                        TempMovie = new Movie(i.getString("cname"), i.getString("cid"), "");
+                        movieList.add(TempMovie);
+                        Toast.makeText(PersonDash.this, TempMovie.getTitle(), Toast.LENGTH_SHORT).show();
+                        TempMovie = null;
+                    }
+                }
+                if (!movieList.isEmpty()) {
+                    addCompanyCards();
+                }
+            }
+        });
+    }
+
+    private void InitializeContentView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-        mAdapter = new CompaniesAdapter(CompList);
+        mAdapter = new MoviesAdapter(movieList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-        ViewHelper();
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                Movie movie = movieList.get(position);
+                LayoutInflater inflater = getLayoutInflater();
+                View AlertLayout = inflater.inflate(R.layout.company_details_dialog, null);
+                final TextView CompID = AlertLayout.findViewById(R.id.comp_id);
+                final TextView CompName = AlertLayout.findViewById(R.id.comp_name);
+                CompID.setText(movie.getGenre());
+                CompName.setText(movie.getTitle());
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(PersonDash.this);
+                alert.setTitle("Company Details");
+                alert.setView(AlertLayout);
+                alert.setCancelable(false);
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                alert.setNegativeButton("Done", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                AlertDialog dialog = alert.create();
+                dialog.show();
+            }
+        }));
+        recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);
     }
 
-    private void ViewHelper() {
-        CompanyItem Company = new CompanyItem("VarTech","varunm100@gmail.com");
-        CompList.add(Company);
-        Company = new CompanyItem("Arkham Stations","batmansuper@gmail.com");
-        CompList.add(Company);
-        Company = new CompanyItem("VarTech","varunm100@gmail.com");
-        CompList.add(Company);
-        Company = new CompanyItem("Zebi","babu@zebi.co");
-        CompList.add(Company);
-        Company = new CompanyItem("Personal","varunm11111@gmail.com");
-        CompList.add(Company);
-        Log.wtf("CALLED","mAdapter NOT WORKING YAYA");
+    private void addCompanyCards() {
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         mAdapter.notifyDataSetChanged();
     }
 
@@ -354,7 +405,11 @@ public class PersonDash extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String CompNameFinalStr = CompName.getText().toString();
-                CreateCompany(CompNameFinalStr);
+                if (CompNameFinalStr.trim().length() > 0) {
+                    CreateCompany(CompNameFinalStr);
+                } else {
+                    Toast.makeText(PersonDash.this, "Company Could NOT be creted Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
+                }
             }
         });
         AlertDialog dialog = alert.create();
@@ -387,5 +442,4 @@ public class PersonDash extends AppCompatActivity {
         AlertDialog dialog = alert.create();
         dialog.show();
     }
-
 }

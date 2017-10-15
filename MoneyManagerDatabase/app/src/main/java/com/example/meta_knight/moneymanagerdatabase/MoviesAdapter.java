@@ -8,40 +8,44 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class CompaniesAdapter extends RecyclerView.Adapter<CompaniesAdapter.MyViewHolder> {
-    private List<CompanyItem> companyList;
+public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHolder> {
+
+    private List<Movie> moviesList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, name;
+        public TextView title, year, genre;
 
         public MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.title);
-            name = (TextView) view.findViewById(R.id.name);
+            genre = (TextView) view.findViewById(R.id.genre);
+            year = (TextView) view.findViewById(R.id.year);
         }
     }
 
-    public CompaniesAdapter (List<CompanyItem> CompanyList) {
-        this.companyList = CompanyList;
+
+    public MoviesAdapter(List<Movie> moviesList) {
+        this.moviesList = moviesList;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.company_list_row, parent, false);
+                .inflate(R.layout.movie_list_row, parent, false);
 
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        CompanyItem CompItem = companyList.get(position);
-        holder.title.setText(CompItem.getCompName());
-        holder.name.setText(CompItem.getOwner());
+        Movie movie = moviesList.get(position);
+        holder.title.setText(movie.getTitle());
+        holder.genre.setText(movie.getGenre());
+        holder.year.setText(movie.getYear());
     }
 
     @Override
     public int getItemCount() {
-        return companyList.size();
+        return moviesList.size();
     }
 }
