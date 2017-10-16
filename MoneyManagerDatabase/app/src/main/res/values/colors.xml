@@ -5,4 +5,10 @@
     <color name="colorAccent">#FF4081</color>
     <color name="year">#999999</color>
     <color name="title">#222222</color>
+    <color name="colorPrimaryCompDash">#111</color>
+    <color name="colorPrimaryDarkCompDash">#FFF</color>
+    <color name="colorAccentCompDash">#ea3732</color>
+    <color name="bg_row_background">#fa315b</color>
+    <color name="item_name">#535353</color>
+    <color name="description">#a9a9a9</color>
 </resources>

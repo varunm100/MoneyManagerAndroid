@@ -2,6 +2,8 @@ package com.example.meta_knight.moneymanagerdatabase;
 
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,12 +100,18 @@ public class PersonDash extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-
+                final Movie movie = movieList.get(position);
+                Intent CompanyDashIntent = new Intent(PersonDash.this, CompanyDash.class);
+                CompanyDashIntent.putExtra("companyID", movie.getGenre());
+                CompanyDashIntent.putExtra("email", email);
+                CompanyDashIntent.putExtra("uid", uid);
+                CompanyDashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(CompanyDashIntent);
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                Movie movie = movieList.get(position);
+                final Movie movie = movieList.get(position);
                 LayoutInflater inflater = getLayoutInflater();
                 View AlertLayout = inflater.inflate(R.layout.company_details_dialog, null);
                 final TextView CompID = AlertLayout.findViewById(R.id.comp_id);
@@ -114,10 +123,17 @@ public class PersonDash extends AppCompatActivity {
                 alert.setTitle("Company Details");
                 alert.setView(AlertLayout);
                 alert.setCancelable(false);
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /*alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
+                    }
+                });*/
+                final Button DeleteCompany = (Button) AlertLayout.findViewById(R.id.DeleteComp);
+                DeleteCompany.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DeleteCompany(movie.getGenre());
                     }
                 });
 
@@ -127,11 +143,67 @@ public class PersonDash extends AppCompatActivity {
 
                     }
                 });
+
                 AlertDialog dialog = alert.create();
                 dialog.show();
             }
         }));
         recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);
+    }
+
+    private void DeleteCompany(String CUID) {
+        DocumentReference mDocDeleteRef = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + CUID);
+        mDocDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(PersonDash.this, "Deleted Company User Instance", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(PersonDash.this, "FAILED TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        DocumentReference mDocDeleteCompRef = FirebaseFirestore.getInstance().document("companies/" + CUID);
+        mDocDeleteCompRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(PersonDash.this, "Deleted Company!", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(PersonDash.this, "FAILED TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        CollectionReference mDocDeleteComCollection = FirebaseFirestore.getInstance().collection("companies/" + CUID + "/people");
+        mDocDeleteComCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot documentSnapshots) {
+                List <DocumentSnapshot> DocSnapShotsPeopleVec = new ArrayList<>();
+                DocSnapShotsPeopleVec = documentSnapshots.getDocuments();
+                for (DocumentSnapshot i : DocSnapShotsPeopleVec) {
+                    i.getReference().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(PersonDash.this, "UNABLE TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(PersonDash.this, "UNABLE TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void addCompanyCards() {
@@ -203,6 +275,7 @@ public class PersonDash extends AppCompatActivity {
                     Map<String, Object> PersonAdd = new HashMap<>();
                     PersonAdd.put("puid", uid);
                     PersonAdd.put("pname", name);
+                    PersonAdd.put("role","admin");
                     ListPeople.set(PersonAdd).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -219,6 +292,7 @@ public class PersonDash extends AppCompatActivity {
                     Map<String, Object> AddPersonList = new HashMap<>();
                     AddPersonList.put("cid", CompanyUserId);
                     AddPersonList.put("cname", TempComp01);
+                    AddPersonList.put("role", "admin");
                     addCompanyList.set(AddPersonList).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -268,11 +342,12 @@ public class PersonDash extends AppCompatActivity {
         personComp.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
+                if (!documentSnapshot.exists()) {
                     Toast.makeText(PersonDash.this, "Company DOES NOT exist", Toast.LENGTH_SHORT).show();
                     DocumentReference addPersonCompany = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + cuidTemp);
                     Map<String, Object> addPersonCompanyData = new HashMap<>();
                     addPersonCompanyData.put("cid", cuidTemp);
+                    addPersonCompanyData.put("role","employ");
                     addPersonCompany.set(addPersonCompanyData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -289,6 +364,7 @@ public class PersonDash extends AppCompatActivity {
                     Map<String, Object> addCompanyPersonMap = new HashMap<>();
                     addCompanyPersonMap.put("pname", name);
                     addCompanyPersonMap.put("puid", uid);
+                    addCompanyPersonMap.put("role", "employ");
                     addCompanyPerson.set(addCompanyPersonMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -324,58 +400,6 @@ public class PersonDash extends AppCompatActivity {
                     Toast.makeText(PersonDash.this, "User DOES NOT Exists!", Toast.LENGTH_SHORT).show();
                     CreateUser(uid, email, name, PhotoURL);
                 }
-            }
-        });
-    }
-
-    private double AmountExp;
-    private String Desc;
-    private String TitleExp;
-    private int CategoryExp;
-    private Date ExpDate;
-    private String InCuid;
-    private String CombinedStrExp;
-    private void CreateExpense(double Amount, String Description, String title, int Category, Date ExpenseDate, final String InputCid) {
-        AmountExp = Amount;
-        Desc = Description;
-        TitleExp = title;
-        CategoryExp = Category;
-        ExpDate = ExpenseDate;
-        InCuid = InputCid;
-        CombinedStrExp = String.valueOf(Amount) + Description + title + String.valueOf(Category) + ExpenseDate.toString() + InputCid;
-
-        DocumentReference mDocExpenseRef = FirebaseFirestore.getInstance().document("companies/" + InputCid + "/expenses/" + "e" + sha256(CombinedStrExp));
-        mDocExpenseRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (!documentSnapshot.exists()) {
-                    Map<String, Object> mDocExpenseData = new HashMap<>();
-                    DocumentReference mDocExpenseRef = FirebaseFirestore.getInstance().document("companies/" + InCuid + "/expenses/" + "e" + sha256(CombinedStrExp));
-                    mDocExpenseData.put("amount", AmountExp);
-                    mDocExpenseData.put("title", TitleExp);
-                    mDocExpenseData.put("date", ExpDate.toString());
-                    mDocExpenseData.put("ownerEmail", email);
-                    mDocExpenseData.put("description", Desc);
-                    mDocExpenseData.put("category", CategoryExp);
-                    mDocExpenseRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(PersonDash.this, "Created New Expense!", Toast.LENGTH_SHORT).show();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(PersonDash.this, "FAILED to create new Expense!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    Toast.makeText(PersonDash.this, "Expense Already Exists!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(PersonDash.this, "FAILED to Create New Expense", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -23,6 +23,11 @@
                 android:label="@string/title_activity_person_dash"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+                android:name=".CompanyDash"
+                android:label="@string/title_activity_company_dash"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
