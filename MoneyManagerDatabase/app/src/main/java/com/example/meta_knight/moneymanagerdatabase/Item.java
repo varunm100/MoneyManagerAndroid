@@ -8,8 +8,7 @@ public class Item {
     String thumbnail;
     String eid;
 
-    public Item() {
-    }
+    public Item() { }
 
     public String getEid() { return eid; }
 

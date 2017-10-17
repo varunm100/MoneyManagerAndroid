@@ -49,6 +49,7 @@ public class PersonDash extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
+            System.out.println();
             email = bundle.getString("email");
             name = bundle.getString("name");
             uid = bundle.getString("uid");
@@ -73,8 +74,9 @@ public class PersonDash extends AppCompatActivity {
                 List<Movie> TempCompanyList = new ArrayList<>();
                 movieList.clear();
                 for (DocumentSnapshot i : DocSnapshotVec) {
-                    if (i.getString("cid") != "null") {
-                        TempMovie = new Movie(i.getString("cname"), i.getString("cid"), "");
+                    if (i.getString("cid") != "null" && i.getString("cname") != null) {
+                        TempMovie = new Movie(i.getString("cname"), i.getString("cid") + "\nRole: " + i.getString("role").toUpperCase(), "");
+                        TempMovie.setSecretString(i.getString("cid"));
                         movieList.add(TempMovie);
                         Toast.makeText(PersonDash.this, TempMovie.getTitle(), Toast.LENGTH_SHORT).show();
                         TempMovie = null;
@@ -102,7 +104,7 @@ public class PersonDash extends AppCompatActivity {
             public void onClick(View view, int position) {
                 final Movie movie = movieList.get(position);
                 Intent CompanyDashIntent = new Intent(PersonDash.this, CompanyDash.class);
-                CompanyDashIntent.putExtra("companyID", movie.getGenre());
+                CompanyDashIntent.putExtra("companyID", movie.GetSecretString());
                 CompanyDashIntent.putExtra("email", email);
                 CompanyDashIntent.putExtra("uid", uid);
                 CompanyDashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -432,7 +434,7 @@ public class PersonDash extends AppCompatActivity {
                 if (CompNameFinalStr.trim().length() > 0) {
                     CreateCompany(CompNameFinalStr);
                 } else {
-                    Toast.makeText(PersonDash.this, "Company Could NOT be creted Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
+                    Toast.makeText(PersonDash.this, "Company Could NOT be created Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -460,7 +462,11 @@ public class PersonDash extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String CompId = CompID.getText().toString();
-                JoinCompany(CompId);
+                if (CompId.trim().length() > 0) {
+                    JoinCompany(CompId);
+                } else {
+                    Toast.makeText(PersonDash.this, "Company Could NOT be created Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
+                }
             }
         });
         AlertDialog dialog = alert.create();

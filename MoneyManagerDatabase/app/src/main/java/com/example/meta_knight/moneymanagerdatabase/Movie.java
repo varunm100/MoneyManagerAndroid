@@ -1,7 +1,7 @@
 package com.example.meta_knight.moneymanagerdatabase;
 
 public class Movie {
-    private String title, genre, year;
+    private String title, genre, year, SecretString;
 
     public Movie() {
     }
@@ -35,4 +35,8 @@ public class Movie {
     public void setGenre(String genre) {
         this.genre = genre;
     }
+
+    public void setSecretString(String InSec) { this.SecretString = InSec; }
+
+    public String GetSecretString () { return this.SecretString; }
 }

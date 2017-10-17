@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -60,70 +61,71 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
             Toast.makeText(this, "Got Null Bundle", Toast.LENGTH_SHORT).show();
         }
         InitiateRecylerView();
-        AddListenerSnapshot();
+        if (uid != null && GlobalCompCUID != null) {
+            AddListenerSnapshot();
+        } else {
+            Log.wtf("UIDGLOBAL", "VALUE NULL NOOOO");
+        }
     }
-
     private void AddListenerSnapshot() {
-        DocumentReference mDocR = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + GlobalCompCUID);
-        mDocR.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                GlobalRole = documentSnapshot.getString("role");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(CompanyDash.this, "Error While trying to get User Data", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        if (GlobalRole != null) {
-            CollectionReference mDocRef = FirebaseFirestore.getInstance().collection("companies/" + GlobalCompCUID + "/expenses");
-            mDocRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        if (uid != null && GlobalCompCUID != null) {
+            DocumentReference mDocR = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + GlobalCompCUID);
+            Log.wtf("INFO", "users/" + uid + "/companies/" + GlobalCompCUID);
+            mDocR.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
-                public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                    List<DocumentSnapshot> QueryList = documentSnapshots.getDocuments();
-                    List<Item> ViewItems = new ArrayList<>();
-                    if (!QueryList.isEmpty()) {
-                        if (Objects.equals(GlobalRole, "admin")) {
-                            for (DocumentSnapshot i : QueryList) {
-                                Item TempDocSnapShot = new Item();
-                                GlobalItemID += 1;
-                                TempDocSnapShot.setId(GlobalItemID);
-                                TempDocSnapShot.setName(i.getString("title"));
-                                TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail"));
-                                TempDocSnapShot.setPrice(i.getDouble("amount"));
-                                TempDocSnapShot.setEid(i.getString("eid"));
-                                ViewItems.add(TempDocSnapShot);
-                            }
-                            if (ViewItems != null) {
-                                AddItems(ViewItems);
-                            }
-                        } else if (Objects.equals(GlobalRole, "employ")) {
-                            for (DocumentSnapshot i : QueryList) {
-                                if (Objects.equals(email, i.getString("ownerEmail"))) {
-                                    Item TempDocSnapShot = new Item();
-                                    GlobalItemID += 1;
-                                    TempDocSnapShot.setId(GlobalItemID);
-                                    TempDocSnapShot.setName(i.getString("title"));
-                                    TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail"));
-                                    TempDocSnapShot.setEid(i.getString("eid"));
-                                    TempDocSnapShot.setPrice(i.getDouble("amount"));
-                                    ViewItems.add(TempDocSnapShot);
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    GlobalRole = documentSnapshot.getString("role");
+                    CollectionReference mDocRef = FirebaseFirestore.getInstance().collection("companies/" + GlobalCompCUID + "/expenses");
+                    mDocRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                            List<DocumentSnapshot> QueryList = documentSnapshots.getDocuments();
+                            List<Item> ViewItems = new ArrayList<>();
+                            if (!QueryList.isEmpty()) {
+                                if (Objects.equals(GlobalRole, "admin")) {
+                                    for (DocumentSnapshot i : QueryList) {
+                                        Item TempDocSnapShot = new Item();
+                                        GlobalItemID += 1;
+                                        TempDocSnapShot.setId(GlobalItemID);
+                                        TempDocSnapShot.setName(i.getString("title"));
+                                        TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail"));
+                                        TempDocSnapShot.setPrice(i.getDouble("amount"));
+                                        TempDocSnapShot.setEid(i.getString("eid"));
+                                        ViewItems.add(TempDocSnapShot);
+                                    }
+                                    if (ViewItems != null) {
+                                        AddItems(ViewItems);
+                                    }
+                                } else if (Objects.equals(GlobalRole, "employ")) {
+                                    for (DocumentSnapshot i : QueryList) {
+                                        if (Objects.equals(email, i.getString("ownerEmail"))) {
+                                            Item TempDocSnapShot = new Item();
+                                            GlobalItemID += 1;
+                                            TempDocSnapShot.setId(GlobalItemID);
+                                            TempDocSnapShot.setName(i.getString("title"));
+                                            TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail"));
+                                            TempDocSnapShot.setEid(i.getString("eid"));
+                                            TempDocSnapShot.setPrice(i.getDouble("amount"));
+                                            ViewItems.add(TempDocSnapShot);
+                                        }
+                                    }
+                                    if (ViewItems != null) {
+                                        AddItems(ViewItems);
+                                    }
+                                } else {
+                                    Toast.makeText(CompanyDash.this, "ERROR WHILE GETTING DATA", Toast.LENGTH_SHORT).show();
                                 }
                             }
-                            if (ViewItems != null) {
-                                AddItems(ViewItems);
-                            }
-                        } else {
-                            Toast.makeText(CompanyDash.this, "ERROR WHILE GETTING DATA", Toast.LENGTH_SHORT).show();
                         }
-                    }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(CompanyDash.this, "Error While trying to get User Data", Toast.LENGTH_SHORT).show();
                 }
             });
-        } else {
-            Toast.makeText(this, "ERROR WHILE GETTING DATA", Toast.LENGTH_SHORT).show();
         }
     }
 
