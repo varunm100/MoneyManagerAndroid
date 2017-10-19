@@ -31,6 +31,8 @@ import com.google.firebase.firestore.EventListener;
 
 import javax.microedition.khronos.opengles.GL;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
@@ -243,7 +245,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     mDocExpenseData.put("date", ExpDate.toString());
                     mDocExpenseData.put("ownerEmail", email);
                     mDocExpenseData.put("description", Desc);
-                    mDocExpenseData.put("category", CategoryExp);
+                    mDocExpenseData.put("category", String.valueOf(CategoryExp));
                     mDocExpenseData.put("eid", "e" + sha256(CombinedStrExp));
                     mDocExpenseRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -254,6 +256,22 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(CompanyDash.this, "FAILED to create new Expense!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Calendar calen = Calendar.getInstance();
+                    calen.setTime(ExpDate);
+                    DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + InCuid + "/history/" + "ae" + sha256(CombinedStrExp + calen.getTimeInMillis()));
+                    mDocExpenseData.put("type", "append");
+                    mDocExpenseData.put("tdate", ExpDate.toString());
+                    mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(CompanyDash.this, "Added Data in History", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(CompanyDash.this, "Failed to add Data to history", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
@@ -272,18 +290,79 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
     private String sha256(String inputString) {
         return (Hashing.sha256().hashString(inputString, StandardCharsets.UTF_8).toString());
     }
-
+    private double AmountExpD;
+    String DescD;
+    String TitleExpD;
+    String CategoryExpD;
+    String ExpDateD;
+    String InCuidD;
+    String CompletedDeleteEID;
+    Date ExpDataObjD;
+    String CombinedStrExpD;
     private void DeleteExpense(String Eid) {
         DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + Eid);
-        mDocRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+        mDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(Void aVoid) {
-                Toast.makeText(CompanyDash.this, "Deleted Expense!", Toast.LENGTH_SHORT).show();
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists()) {
+                    Map<String, Object> mDocExpenseData = new HashMap<>();
+                    AmountExpD = documentSnapshot.getDouble("amount");
+                    TitleExpD = documentSnapshot.getString("title");
+                    ExpDateD = documentSnapshot.getString("date");
+                    email = documentSnapshot.getString("ownerEmail");
+                    DescD = documentSnapshot.getString("description");
+                    CategoryExpD = documentSnapshot.getString("category");
+                    CompletedDeleteEID = documentSnapshot.getString("eid");
+                    try {
+                        ExpDataObjD = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(ExpDateD);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    CombinedStrExp = String.valueOf(AmountExpD) + DescD + TitleExpD + String.valueOf(CategoryExpD) + ExpDateD + GlobalCompCUID;
+                    mDocExpenseData.put("amount", AmountExpD);
+                    mDocExpenseData.put("title", TitleExpD);
+                    mDocExpenseData.put("date", ExpDateD.toString());
+                    mDocExpenseData.put("ownerEmail", email);
+                    mDocExpenseData.put("description", DescD);
+                    mDocExpenseData.put("category", CategoryExpD);
+                    mDocExpenseData.put("eid", CompletedDeleteEID);
+                    Calendar calen = Calendar.getInstance();
+                    calen.setTime(ExpDataObjD);
+                    DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/history/" + "de" + sha256(CombinedStrExp + calen.getTimeInMillis()));
+                    Date TodayDate = Calendar.getInstance().getTime();
+                    mDocExpenseData.put("type", "delete");
+                    mDocExpenseData.put("tdate", TodayDate.toString());
+                    mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(CompanyDash.this, "Added Data in History", Toast.LENGTH_SHORT).show();
+                            DocumentReference mDocRefDeleteDocument = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + CompletedDeleteEID);
+                            mDocRefDeleteDocument.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(CompanyDash.this, "Deleted Expense!", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(CompanyDash.this, "ERROR WHILE DELETING EXPENSE!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(CompanyDash.this, "Failed to add Data to history", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(CompanyDash.this, "ERROR While trying to delete expense", Toast.LENGTH_SHORT).show();
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(CompanyDash.this, "ERROR WHILE DELETING EXPENSE!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CompanyDash.this, "ERROR WHILE ADDING TO HISTORY", Toast.LENGTH_SHORT).show();
             }
         });
     }
