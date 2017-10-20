@@ -2,6 +2,7 @@ package com.example.meta_knight.moneymanagerdatabase;
 
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,8 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.*;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.hash.Hashing;
@@ -34,6 +34,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static android.media.CamcorderProfile.get;
 
 public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -91,9 +93,10 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                                         GlobalItemID += 1;
                                         TempDocSnapShot.setId(GlobalItemID);
                                         TempDocSnapShot.setName(i.getString("title"));
-                                        TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail"));
+                                        TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail") + "\nCategory • " + GetCategoryFromInt(i.getString("category")) + " | Status • " + GetStatusFromInt(i.getDouble("status")));
                                         TempDocSnapShot.setPrice(i.getDouble("amount"));
                                         TempDocSnapShot.setEid(i.getString("eid"));
+                                        TempDocSnapShot.setThumbnail(GetUriFromString(GetCategoryFromInt(i.getString("category"))));
                                         ViewItems.add(TempDocSnapShot);
                                     }
                                     if (ViewItems != null) {
@@ -106,9 +109,10 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                                             GlobalItemID += 1;
                                             TempDocSnapShot.setId(GlobalItemID);
                                             TempDocSnapShot.setName(i.getString("title"));
-                                            TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail"));
+                                            TempDocSnapShot.setDescription(i.getString("description") + "\nOwner • " + i.getString("ownerEmail") + "\nCategory • " + GetCategoryFromInt(i.getString("category")) + " | Status • " + GetStatusFromInt(i.getDouble("status")));
                                             TempDocSnapShot.setEid(i.getString("eid"));
                                             TempDocSnapShot.setPrice(i.getDouble("amount"));
+                                            TempDocSnapShot.setThumbnail(GetUriFromString(GetCategoryFromInt(i.getString("category"))));
                                             ViewItems.add(TempDocSnapShot);
                                         }
                                     }
@@ -131,6 +135,49 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         }
     }
 
+    private String GetCategoryFromInt(String InputString) {
+        int InputInt = Integer.parseInt(InputString);
+        if (InputInt == 1) {
+            return "travel";
+        } else if (InputInt == 2) {
+            return "food";
+        } else if (InputInt == 3) {
+            return "electronics";
+        } else if (InputInt == 4) {
+            return "software";
+        } else if (InputInt == 5) {
+            return "other";
+        } else {
+            return "UNKNOWN";
+        }
+    }
+
+    private String GetStatusFromInt(double InputInt) {
+        if (InputInt == 1) {
+            return "paid";
+        } else if (InputInt == -1) {
+            return "not paid";
+        } else {
+            return "UNKNOWN";
+        }
+    }
+
+    private String GetUriFromString(String InputString) {
+        if (InputString == "travel") {
+            return "https://png.icons8.com/airport/dusk/64";
+        } else if (InputString == "food") {
+            return "https://png.icons8.com/pizza/office/16";
+        } else if (InputString == "electronics") {
+            return "https://png.icons8.com/motherboard/dusk/64";
+        } else if (InputString == "software") {
+            return "https://maxcdn.icons8.com/Share/icon/Programming//software_installer1600.png";
+        } else if (InputString == "other") {
+            return "http://guineeservices.com/wp-content/uploads/2015/05/Misc-Icon.png";
+        } else {
+            return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Icon-round-Question_mark.svg/200px-Icon-round-Question_mark.svg.png";
+        }
+    }
+
     private void InitiateRecylerView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -149,6 +196,155 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                final Item ItemSelected = cartList.get(position);
+                LayoutInflater inflater = getLayoutInflater();
+                View AlertLayout = inflater.inflate(R.layout.expense_details_dialog, null);
+                final Spinner mSpinnerRef= AlertLayout.findViewById(R.id.status_spinner);
+                List<String> listStatusSpinner = new ArrayList<String>();
+                listStatusSpinner.add("paid");
+                listStatusSpinner.add("not paid");
+                ArrayAdapter<String> dataAdapterCategory = new ArrayAdapter<String>(CompanyDash.this,
+                        android.R.layout.simple_spinner_item, listStatusSpinner);
+                dataAdapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mSpinnerRef.setAdapter(dataAdapterCategory);
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(CompanyDash.this);
+                alert.setTitle("Edit Expense");
+                alert.setView(AlertLayout);
+                alert.setCancelable(false);
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                alert.setNegativeButton("Done", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (mSpinnerRef.getSelectedItem().toString() == "paid") {
+                            ChangeStatus(ItemSelected.getEid(), 1.0d);
+                        } else if (mSpinnerRef.getSelectedItem().toString() == "not paid") {
+                            ChangeStatus(ItemSelected.getEid(), -1.0d);
+                        } else {
+                            Toast.makeText(CompanyDash.this, "UNABLE TO CHANGE STATUS", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                AlertDialog dialog = alert.create();
+                dialog.show();
+            }
+            @Override
+            public void onLongClick(View view, int position) {
+                final Item ItemSelected = cartList.get(position);
+            }
+        }));
+        recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);
+    }
+
+    Map<String, Object> InputDataDocFoo = new HashMap<>();
+    private void CopyDocumentContents(String InputDocument, String OutputDocument) {
+        final DocumentReference mDocRefInput = FirebaseFirestore.getInstance().document(InputDocument);
+        final DocumentReference mDocRefOutput = FirebaseFirestore.getInstance().document(OutputDocument);
+
+        mDocRefInput.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                InputDataDocFoo = documentSnapshot.getData();
+                mDocRefOutput.set(InputDataDocFoo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+    double NewStatus;
+    String InputGlobEid;
+    Date today;
+    Calendar calenTemp;
+    private void ChangeStatus(String InputGlobEidIn, final double NewStatusIn) {
+        Date todayIn = Calendar.getInstance().getTime();
+        Calendar calen = Calendar.getInstance();
+        NewStatus = NewStatusIn;
+        InputGlobEid = InputGlobEidIn;
+        calen.setTime(todayIn);
+        today = todayIn;
+        calenTemp = calen;
+        final DocumentReference mDocBeforeRef = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/history/" + "ee" + sha256(InputGlobEid + calen.getTimeInMillis()) + "/before/before");
+        DocumentReference mDocCopyContents = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + InputGlobEid);
+        mDocCopyContents.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.getDouble("status") == NewStatusIn) {
+                    Toast.makeText(CompanyDash.this, "No Changes Made", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                InputDataDocFoo = documentSnapshot.getData();
+                mDocBeforeRef.set(InputDataDocFoo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        DocumentReference mDocRefStatus = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + InputGlobEid);
+                        mDocRefStatus.update("status", NewStatus).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(CompanyDash.this, "Updated Expense Status", Toast.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(CompanyDash.this, "FAILED TO UPDATE EXPENSE STATUS", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        DocumentReference mDocBeforeRefa = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/history/" + "ee" + sha256(InputGlobEid + calenTemp.getTimeInMillis()) + "/after/after");
+                        DocumentReference mDocCopyContentsa = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + InputGlobEid);
+                        CopyDocumentContents(mDocCopyContentsa.getPath(), mDocBeforeRefa.getPath());
+
+                        DocumentReference mDocGetRootExpenseData = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/history/" + "ee" + sha256(InputGlobEid + calenTemp.getTimeInMillis()));
+                        Map <String, Object> mDocExpenseData = new HashMap<>();
+                        mDocExpenseData.put("type", "edit");
+                        mDocExpenseData.put("tdate", today.toString());
+                        mDocGetRootExpenseData.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(CompanyDash.this, "FAILED TO ADD EDIT", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
     }
 
     private void AddItems(List<Item> InputList) {
@@ -186,11 +382,33 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         final EditText ExpenseName = AlertLayout.findViewById(R.id.expense_name);
         final EditText ExpensePrice = AlertLayout.findViewById(R.id.expense_price);
         final EditText ExpenseDesc = AlertLayout.findViewById(R.id.expense_desc);
+        final Spinner ExpenseStatus = AlertLayout.findViewById(R.id.status_spinner);
+        final Spinner ExpenseCategory = AlertLayout.findViewById(R.id.category_spinner);
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Create New Expense");
         alert.setView(AlertLayout);
         alert.setCancelable(false);
+
+        List<String> listStatus = new ArrayList<String>();
+        listStatus.add("paid");
+        listStatus.add("not paid");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, listStatus);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ExpenseStatus.setAdapter(dataAdapter);
+
+        List<String> listCategory = new ArrayList<String>();
+        listCategory.add("travel");
+        listCategory.add("food");
+        listCategory.add("electronics");
+        listCategory.add("software");
+        listCategory.add("other");
+        ArrayAdapter<String> dataAdapterCategory = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, listCategory);
+        dataAdapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ExpenseCategory.setAdapter(dataAdapterCategory);
+
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -204,10 +422,32 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                 String ExpenseNameFinal = ExpenseName.getText().toString();
                 String ExpensePriceFinal = ExpensePrice.getText().toString();
                 String ExpenseDescFinal = ExpenseDesc.getText().toString();
+                final double MainStatusSpinner;
+                final int CategoryMainCreate;
+                if (ExpenseStatus.getSelectedItem().toString() == "paid") {
+                    MainStatusSpinner = 1.0d;
+                } else if (ExpenseStatus.getSelectedItem().toString() == "not paid") {
+                    MainStatusSpinner = -1.0d;
+                } else {
+                    MainStatusSpinner = -100000d;
+                }
 
+                if (ExpenseCategory.getSelectedItem().toString() == "travel") {
+                    CategoryMainCreate = 1;
+                } else if (ExpenseCategory.getSelectedItem().toString() == "food") {
+                    CategoryMainCreate = 2;
+                } else if (ExpenseCategory.getSelectedItem().toString() == "electronics") {
+                    CategoryMainCreate = 3;
+                } else if (ExpenseCategory.getSelectedItem().toString() == "software") {
+                    CategoryMainCreate = 4;
+                } else if (ExpenseCategory.getSelectedItem().toString() == "other") {
+                    CategoryMainCreate  = 5;
+                } else {
+                    CategoryMainCreate = -100000;
+                }
                 if (ExpenseNameFinal.trim().length() > 0 && ExpensePriceFinal.trim().length() > 0 && ExpenseDescFinal.trim().length() > 0) {
                     Date TodayDate = Calendar.getInstance().getTime();
-                    CreateExpense(Double.parseDouble(ExpensePriceFinal), ExpenseDescFinal, ExpenseNameFinal, -1, TodayDate, GlobalCompCUID);
+                    CreateExpense(Double.parseDouble(ExpensePriceFinal), ExpenseDescFinal, ExpenseNameFinal, CategoryMainCreate, TodayDate, GlobalCompCUID, MainStatusSpinner);
                 } else {
                     Toast.makeText(CompanyDash.this, "Expense Could NOT be created Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
                 }
@@ -224,7 +464,8 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
     private Date ExpDate;
     private String InCuid;
     private String CombinedStrExp;
-    private void CreateExpense(double Amount, String Description, String title, int Category, Date ExpenseDate, final String InputCid) {
+    private double InStatus;
+    private void CreateExpense(double Amount, String Description, String title, int Category, Date ExpenseDate, final String InputCid, double InputStatus) {
         AmountExp = Amount;
         Desc = Description;
         TitleExp = title;
@@ -232,6 +473,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         ExpDate = ExpenseDate;
         InCuid = InputCid;
         CombinedStrExp = String.valueOf(Amount) + Description + title + String.valueOf(Category) + ExpenseDate.toString() + InputCid;
+        InStatus = InputStatus;
 
         DocumentReference mDocExpenseRef = FirebaseFirestore.getInstance().document("companies/" + InputCid + "/expenses/" + "e" + sha256(CombinedStrExp));
         mDocExpenseRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -247,6 +489,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     mDocExpenseData.put("description", Desc);
                     mDocExpenseData.put("category", String.valueOf(CategoryExp));
                     mDocExpenseData.put("eid", "e" + sha256(CombinedStrExp));
+                    mDocExpenseData.put("status", InStatus);
                     mDocExpenseRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -291,14 +534,15 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         return (Hashing.sha256().hashString(inputString, StandardCharsets.UTF_8).toString());
     }
     private double AmountExpD;
-    String DescD;
-    String TitleExpD;
-    String CategoryExpD;
-    String ExpDateD;
-    String InCuidD;
-    String CompletedDeleteEID;
-    Date ExpDataObjD;
-    String CombinedStrExpD;
+    private String DescD;
+    private String TitleExpD;
+    private String CategoryExpD;
+    private String ExpDateD;
+    private String InCuidD;
+    private String CompletedDeleteEID;
+    private Date ExpDataObjD;
+    private String CombinedStrExpD;
+    private double mInStatus;
     private void DeleteExpense(String Eid) {
         DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + Eid);
         mDocRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -313,6 +557,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     DescD = documentSnapshot.getString("description");
                     CategoryExpD = documentSnapshot.getString("category");
                     CompletedDeleteEID = documentSnapshot.getString("eid");
+                    mInStatus = documentSnapshot.getDouble("status");
                     try {
                         ExpDataObjD = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(ExpDateD);
                     } catch (ParseException e) {
@@ -326,6 +571,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     mDocExpenseData.put("description", DescD);
                     mDocExpenseData.put("category", CategoryExpD);
                     mDocExpenseData.put("eid", CompletedDeleteEID);
+                    mDocExpenseData.put("status", mInStatus);
                     Calendar calen = Calendar.getInstance();
                     calen.setTime(ExpDataObjD);
                     DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/history/" + "de" + sha256(CombinedStrExp + calen.getTimeInMillis()));
