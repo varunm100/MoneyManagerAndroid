@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     PersonDashIntent.putExtra("email", firebaseAuth.getCurrentUser().getEmail());
                     PersonDashIntent.putExtra("name", firebaseAuth.getCurrentUser().getDisplayName());
                     PersonDashIntent.putExtra("uid", firebaseAuth.getCurrentUser().getUid());
-                    PersonDashIntent.putExtra("PhotoURL", firebaseAuth.getCurrentUser().getPhotoUrl());
+                    PersonDashIntent.putExtra("PhotoURL", firebaseAuth.getCurrentUser().getPhotoUrl().toString());
                     PersonDashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(PersonDashIntent);
                 }

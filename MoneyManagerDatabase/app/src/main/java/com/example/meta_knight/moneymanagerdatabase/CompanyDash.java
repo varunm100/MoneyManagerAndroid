@@ -166,11 +166,11 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         if (InputString == "travel") {
             return "https://png.icons8.com/airport/dusk/64";
         } else if (InputString == "food") {
-            return "https://png.icons8.com/pizza/office/16";
+            return "https://png.icons8.com/food/dusk/64";
         } else if (InputString == "electronics") {
             return "https://png.icons8.com/motherboard/dusk/64";
         } else if (InputString == "software") {
-            return "https://maxcdn.icons8.com/Share/icon/Programming//software_installer1600.png";
+            return "https://png.icons8.com/software-installer/dusk/64";
         } else if (InputString == "other") {
             return "http://guineeservices.com/wp-content/uploads/2015/05/Misc-Icon.png";
         } else {
