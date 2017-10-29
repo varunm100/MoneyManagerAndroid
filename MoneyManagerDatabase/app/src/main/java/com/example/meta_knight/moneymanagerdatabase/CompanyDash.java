@@ -70,6 +70,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         } else {
             Log.wtf("UIDGLOBAL", "VALUE NULL NOOOO");
         }
+        //StartManagePeopleActivity();
     }
     private void AddListenerSnapshot() {
         if (uid != null && GlobalCompCUID != null) {
@@ -455,6 +456,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         });
         AlertDialog dialog = alert.create();
         dialog.show();
+        StartManagePeopleActivity();
     }
 
     private double AmountExp;
@@ -611,5 +613,13 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                 Toast.makeText(CompanyDash.this, "ERROR WHILE ADDING TO HISTORY", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void StartManagePeopleActivity() {
+        Intent ManagePeopleIntent = new Intent(CompanyDash.this, manage_people.class);
+        ManagePeopleIntent.putExtra("companyID", GlobalCompCUID);
+        ManagePeopleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ManagePeopleIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(ManagePeopleIntent);
     }
 }

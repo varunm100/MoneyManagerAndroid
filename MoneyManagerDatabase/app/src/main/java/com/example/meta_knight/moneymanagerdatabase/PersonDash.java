@@ -278,6 +278,7 @@ public class PersonDash extends AppCompatActivity {
                     PersonAdd.put("puid", uid);
                     PersonAdd.put("pname", name);
                     PersonAdd.put("role","admin");
+                    PersonAdd.put("pemail", email);
                     ListPeople.set(PersonAdd).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -344,11 +345,12 @@ public class PersonDash extends AppCompatActivity {
         personComp.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (!documentSnapshot.exists()) {
+                if (documentSnapshot.exists()) {
                     Toast.makeText(PersonDash.this, "Company DOES NOT exist", Toast.LENGTH_SHORT).show();
                     DocumentReference addPersonCompany = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + cuidTemp);
                     Map<String, Object> addPersonCompanyData = new HashMap<>();
                     addPersonCompanyData.put("cid", cuidTemp);
+                    addPersonCompanyData.put("cname", documentSnapshot.getString("cname"));
                     addPersonCompanyData.put("role","employ");
                     addPersonCompany.set(addPersonCompanyData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -367,6 +369,7 @@ public class PersonDash extends AppCompatActivity {
                     addCompanyPersonMap.put("pname", name);
                     addCompanyPersonMap.put("puid", uid);
                     addCompanyPersonMap.put("role", "employ");
+                    addCompanyPersonMap.put("pemail", email);
                     addCompanyPerson.set(addCompanyPersonMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -379,7 +382,7 @@ public class PersonDash extends AppCompatActivity {
                         }
                     });
                 } else {
-                    Toast.makeText(PersonDash.this, "Company Exist Not Creating NEW Company", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PersonDash.this, "Company Does NOT EXIST", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
