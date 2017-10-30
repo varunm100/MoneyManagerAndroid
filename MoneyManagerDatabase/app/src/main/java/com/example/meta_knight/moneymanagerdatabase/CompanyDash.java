@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +22,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -70,7 +72,30 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         } else {
             Log.wtf("UIDGLOBAL", "VALUE NULL NOOOO");
         }
-        //StartManagePeopleActivity();
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavView);
+        BottomNavigationViewHelper.disableShiftMode(bottomNavigationView);
+        Menu MainMenu = bottomNavigationView.getMenu();
+        MenuItem currentItem = MainMenu.getItem(0);
+        currentItem.setChecked(true);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.ExpenseTab:
+                        break;
+                    case R.id.GraphTab:
+                        break;
+                    case R.id.PeopleTab:
+                        StartManagePeopleActivity();
+                        break;
+                    case R.id.HistoryTab:
+                        break;
+                }
+                return false;
+            }
+        });
     }
     private void AddListenerSnapshot() {
         if (uid != null && GlobalCompCUID != null) {
@@ -456,7 +481,6 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         });
         AlertDialog dialog = alert.create();
         dialog.show();
-        StartManagePeopleActivity();
     }
 
     private double AmountExp;

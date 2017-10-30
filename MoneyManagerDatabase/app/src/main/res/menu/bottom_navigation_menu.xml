@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/ExpenseTab"
+            android:icon="@color/bg_row_background"
+            android:title="Expenses">
+    </item>
+
+    <item
+            android:id="@+id/GraphTab"
+            android:icon="@color/bg_row_background"
+            android:title="Statistics">
+    </item>
+
+    <item
+        android:id="@+id/PeopleTab"
+        android:icon="@color/bg_row_background"
+        android:title="People">
+    </item>
+
+    <item
+            android:id="@+id/HistoryTab"
+            android:icon="@color/bg_row_background"
+            android:title="History">
+    </item>
+
+
+</menu>

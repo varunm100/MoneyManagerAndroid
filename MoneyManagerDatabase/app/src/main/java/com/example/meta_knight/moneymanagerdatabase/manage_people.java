@@ -2,6 +2,8 @@ package com.example.meta_knight.moneymanagerdatabase;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +12,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +27,8 @@ import java.util.List;
 public class manage_people extends AppCompatActivity {
 
     private String GlobalCompanyCUID = null;
+    private String email = null;
+    private String uid = null;
 
     private List<Movie> movieList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -36,11 +42,37 @@ public class manage_people extends AppCompatActivity {
         Bundle bundleExtras = getIntent().getExtras();
         if (bundleExtras != null) {
             GlobalCompanyCUID = bundleExtras.getString("companyID");
+            uid = bundleExtras.getString("uid");
+            email = bundleExtras.getString("email");
             InitializeContentView();
             ShowAllPeople();
         } else {
             Toast.makeText(this, "GOT NULL BUNDLE!!! ERROR", Toast.LENGTH_SHORT).show();
         }
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavView);
+        BottomNavigationViewHelper.disableShiftMode(bottomNavigationView);
+        Menu MainMenu = bottomNavigationView.getMenu();
+        MenuItem currentItem = MainMenu.getItem(2);
+        currentItem.setChecked(true);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.ExpenseTab:
+                        GotoCompanyDash();
+                        break;
+                    case R.id.GraphTab:
+                        break;
+                    case R.id.PeopleTab:
+                        break;
+                    case R.id.HistoryTab:
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
     private void ShowAllPeople() {
@@ -99,5 +131,14 @@ public class manage_people extends AppCompatActivity {
             }
         }));
         recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);
+    }
+
+    private void GotoCompanyDash() {
+        Intent CompanyDashIntent = new Intent(manage_people.this, CompanyDash.class);
+        CompanyDashIntent.putExtra("companyID", GlobalCompanyCUID);
+        CompanyDashIntent.putExtra("email", email);
+        CompanyDashIntent.putExtra("uid", uid);
+        CompanyDashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(CompanyDashIntent);
     }
 }
