@@ -68,6 +68,7 @@ public class manage_people extends AppCompatActivity {
                     case R.id.PeopleTab:
                         break;
                     case R.id.HistoryTab:
+                        StartHistoryViewActivity();
                         break;
                 }
                 return false;
@@ -131,6 +132,15 @@ public class manage_people extends AppCompatActivity {
             }
         }));
         recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);
+    }
+
+    private void StartHistoryViewActivity() {
+        Intent StartHistoryActivity = new Intent(manage_people.this, HistoryView.class);
+        StartHistoryActivity.putExtra("companyID", GlobalCompanyCUID);
+        StartHistoryActivity.putExtra("uid", uid);
+        StartHistoryActivity.putExtra("email", email);
+        StartHistoryActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(StartHistoryActivity);
     }
 
     private void GotoCompanyDash() {

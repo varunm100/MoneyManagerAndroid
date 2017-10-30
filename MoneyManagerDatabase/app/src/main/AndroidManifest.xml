@@ -28,8 +28,11 @@
                 android:label="@string/title_activity_company_dash"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".manage_people"
-                  android:theme="@style/AppTheme.NoActionBar">
+        <activity
+                android:name=".manage_people"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".HistoryView">
         </activity>
     </application>
 

@@ -91,6 +91,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                         StartManagePeopleActivity();
                         break;
                     case R.id.HistoryTab:
+                        StartHistoryViewActivity();
                         break;
                 }
                 return false;
@@ -345,7 +346,8 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                         DocumentReference mDocGetRootExpenseData = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/history/" + "ee" + sha256(InputGlobEid + calenTemp.getTimeInMillis()));
                         Map <String, Object> mDocExpenseData = new HashMap<>();
                         mDocExpenseData.put("type", "edit");
-                        mDocExpenseData.put("tdate", today.toString());
+                        mDocExpenseData.put("date", today.toString());
+                        mDocExpenseData.put("ownerEmail", email);
                         mDocGetRootExpenseData.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -531,7 +533,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     calen.setTime(ExpDate);
                     DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + InCuid + "/history/" + "ae" + sha256(CombinedStrExp + calen.getTimeInMillis()));
                     mDocExpenseData.put("type", "append");
-                    mDocExpenseData.put("tdate", ExpDate.toString());
+                    mDocExpenseData.put("date", ExpDate.toString());
                     mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -603,7 +605,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/history/" + "de" + sha256(CombinedStrExp + calen.getTimeInMillis()));
                     Date TodayDate = Calendar.getInstance().getTime();
                     mDocExpenseData.put("type", "delete");
-                    mDocExpenseData.put("tdate", TodayDate.toString());
+                    mDocExpenseData.put("date", TodayDate.toString());
                     mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -639,11 +641,20 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         });
     }
 
+    private void StartHistoryViewActivity() {
+        Intent StartHistoryView = new Intent(CompanyDash.this, HistoryView.class);
+        StartHistoryView.putExtra("companyID", GlobalCompCUID);
+        StartHistoryView.putExtra("uid", uid);
+        StartHistoryView.putExtra("email", email);
+        StartHistoryView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(StartHistoryView);
+    }
+
     private void StartManagePeopleActivity() {
         Intent ManagePeopleIntent = new Intent(CompanyDash.this, manage_people.class);
         ManagePeopleIntent.putExtra("companyID", GlobalCompCUID);
+        ManagePeopleIntent.putExtra("uid", uid);
         ManagePeopleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        ManagePeopleIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(ManagePeopleIntent);
     }
 }
