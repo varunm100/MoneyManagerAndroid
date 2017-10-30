@@ -317,7 +317,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         DocumentReference mDocCopyContents = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + InputGlobEid);
         mDocCopyContents.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onSuccess(final DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.getDouble("status") == NewStatusIn) {
                     Toast.makeText(CompanyDash.this, "No Changes Made", Toast.LENGTH_SHORT).show();
                     return;
@@ -348,6 +348,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                         mDocExpenseData.put("type", "edit");
                         mDocExpenseData.put("date", today.toString());
                         mDocExpenseData.put("ownerEmail", email);
+                        mDocExpenseData.put("title", documentSnapshot.getString("title"));
                         mDocGetRootExpenseData.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -534,7 +535,8 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     DocumentReference mDocRef = FirebaseFirestore.getInstance().document("companies/" + InCuid + "/history/" + "ae" + sha256(CombinedStrExp + calen.getTimeInMillis()));
                     mDocExpenseData.put("type", "append");
                     mDocExpenseData.put("date", ExpDate.toString());
-                    mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mDocExpenseData.put("expName", TitleExp);
+                            mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(CompanyDash.this, "Added Data in History", Toast.LENGTH_SHORT).show();
@@ -606,7 +608,8 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     Date TodayDate = Calendar.getInstance().getTime();
                     mDocExpenseData.put("type", "delete");
                     mDocExpenseData.put("date", TodayDate.toString());
-                    mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mDocExpenseData.put("expName", TitleExpD);
+                            mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(CompanyDash.this, "Added Data in History", Toast.LENGTH_SHORT).show();

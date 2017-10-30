@@ -95,7 +95,6 @@ public class manage_people extends AppCompatActivity {
                     if (i.getString("pname") != null && i.getString("role") != null && i.getString("pemail") != null) {
                         TempMovie = new Movie(i.getString("pname"), i.getString("pemail"), i.getString("role").toUpperCase());
                         movieList.add(TempMovie);
-                        Toast.makeText(manage_people.this, TempMovie.getTitle(), Toast.LENGTH_SHORT).show();
                     }
                 }
                 if (!movieList.isEmpty()) {

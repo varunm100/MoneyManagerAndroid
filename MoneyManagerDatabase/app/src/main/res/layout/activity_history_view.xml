@@ -8,6 +8,20 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:theme="@style/AppTheme.NoActionBar"
         tools:context="com.example.meta_knight.moneymanagerdatabase.HistoryView">
+    <android.support.constraint.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:theme="@style/AppTheme.NoActionBar">
+        <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical" tools:layout_editor_absoluteY="0dp" tools:layout_editor_absoluteX="8dp"/>
+    </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.BottomNavigationView
             android:id="@+id/bottomNavView"
@@ -17,9 +31,4 @@
             android:background="@color/bg_row_background"
             android:layout_alignParentBottom="true"
             app:menu="@menu/bottom_navigation_menu"/>
-    <TextView
-            android:text="On History Tab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" android:id="@+id/textView"/>
 </RelativeLayout>
