@@ -64,6 +64,7 @@ public class HistoryView extends AppCompatActivity {
                         GotoCompanyDash();
                         break;
                     case R.id.GraphTab:
+                        GotoStatsGraph();
                         break;
                     case R.id.PeopleTab:
                         GotoPeopleTab();
@@ -156,5 +157,14 @@ public class HistoryView extends AppCompatActivity {
         GotoCompanyDash.putExtra("uid", uid);
         GotoCompanyDash.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(GotoCompanyDash);
+    }
+
+    private void GotoStatsGraph() {
+        Intent GotoStatsGraphIntent = new Intent(HistoryView.this, StatisticsGraphActivity.class);
+        GotoStatsGraphIntent.putExtra("companyID", GlobalCompCUID);
+        GotoStatsGraphIntent.putExtra("email", email);
+        GotoStatsGraphIntent.putExtra("uid", uid);
+        GotoStatsGraphIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(GotoStatsGraphIntent);
     }
 }

@@ -86,6 +86,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     case R.id.ExpenseTab:
                         break;
                     case R.id.GraphTab:
+                        StartGraphStatActivity();
                         break;
                     case R.id.PeopleTab:
                         StartManagePeopleActivity();
@@ -100,11 +101,14 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
     }
     private void AddListenerSnapshot() {
         if (uid != null && GlobalCompCUID != null) {
-            DocumentReference mDocR = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + GlobalCompCUID);
+            final DocumentReference mDocR = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + GlobalCompCUID);
             Log.wtf("INFO", "users/" + uid + "/companies/" + GlobalCompCUID);
             mDocR.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (!documentSnapshot.exists()) {
+                        Log.wtf("Database Path" ,"users/" + uid + "/companies/" + GlobalCompCUID);
+                    }
                     GlobalRole = documentSnapshot.getString("role");
                     CollectionReference mDocRef = FirebaseFirestore.getInstance().collection("companies/" + GlobalCompCUID + "/expenses");
                     mDocRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -659,5 +663,14 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         ManagePeopleIntent.putExtra("uid", uid);
         ManagePeopleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(ManagePeopleIntent);
+    }
+
+    private void StartGraphStatActivity() {
+        Intent StartGraphAct = new Intent(CompanyDash.this, StatisticsGraphActivity.class);
+        StartGraphAct.putExtra("companyID", GlobalCompCUID);
+        StartGraphAct.putExtra("email", email);
+        StartGraphAct.putExtra("uid", uid);
+        StartGraphAct.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(StartGraphAct);
     }
 }

@@ -64,6 +64,7 @@ public class manage_people extends AppCompatActivity {
                         GotoCompanyDash();
                         break;
                     case R.id.GraphTab:
+                        GotoStatsGraph();
                         break;
                     case R.id.PeopleTab:
                         break;
@@ -149,5 +150,14 @@ public class manage_people extends AppCompatActivity {
         CompanyDashIntent.putExtra("uid", uid);
         CompanyDashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(CompanyDashIntent);
+    }
+
+    private void GotoStatsGraph() {
+        Intent GotoStatGraphIntent = new Intent(manage_people.this, StatisticsGraphActivity.class);
+        GotoStatGraphIntent.putExtra("companyID", GlobalCompanyCUID);
+        GotoStatGraphIntent.putExtra("email", email);
+        GotoStatGraphIntent.putExtra("uid", uid);
+        GotoStatGraphIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(GotoStatGraphIntent);
     }
 }

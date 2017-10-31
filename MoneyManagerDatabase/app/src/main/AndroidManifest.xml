@@ -36,6 +36,8 @@
                 android:name=".HistoryView"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".StatisticsGraphActivity">
+        </activity>
     </application>
 
 </manifest>
