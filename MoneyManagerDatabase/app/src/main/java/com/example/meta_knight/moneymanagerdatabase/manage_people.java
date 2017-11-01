@@ -112,8 +112,8 @@ public class manage_people extends AppCompatActivity {
 
     private void InitializeContentView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        setSupportActionBar(toolbar);
         mAdapter = new MoviesAdapter(movieList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -123,12 +123,12 @@ public class manage_people extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                final Movie SelectedMovie = movieList.get(position);
+                final Movie SelectMovie = movieList.get(position);
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                final Movie SelectedMovie = movieList.get(position);
+                final Movie SelectMovie = movieList.get(position);
             }
         }));
         recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);

@@ -9,6 +9,13 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:context="com.example.meta_knight.moneymanagerdatabase.StatisticsGraphActivity">
 
+    <com.github.mikephil.charting.charts.PieChart
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/PieChartExpenseDistro">
+
+    </com.github.mikephil.charting.charts.PieChart>
+
     <android.support.design.widget.BottomNavigationView
             android:id="@+id/bottomNavView"
             android:layout_width="match_parent"
@@ -18,8 +25,9 @@
             android:layout_alignParentBottom="true"
             app:menu="@menu/bottom_navigation_menu"/>
     <TextView
-            android:text="Stats Activity"
+            android:text="Total Amount: "
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" android:id="@+id/textView"/>
+            android:layout_height="wrap_content" android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" android:layout_marginTop="17dp"
+            android:id="@+id/totalAmount"/>
 </RelativeLayout>

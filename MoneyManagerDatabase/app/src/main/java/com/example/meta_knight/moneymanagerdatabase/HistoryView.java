@@ -125,6 +125,7 @@ public class HistoryView extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mAdapter = new MoviesAdapter(movieList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mLayoutManager.canScrollVertically();
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
