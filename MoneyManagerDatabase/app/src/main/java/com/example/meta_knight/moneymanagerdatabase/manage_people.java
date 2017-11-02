@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
+import es.dmoral.toasty.Toasty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class manage_people extends AppCompatActivity {
             InitializeContentView();
             ShowAllPeople();
         } else {
-            Toast.makeText(this, "GOT NULL BUNDLE!!! ERROR", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "GOT NULL BUNDLE!").show();
         }
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavView);

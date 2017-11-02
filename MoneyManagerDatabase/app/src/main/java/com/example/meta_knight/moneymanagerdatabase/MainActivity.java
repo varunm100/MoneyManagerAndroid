@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -17,6 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
+import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(MainActivity.this, "Connection Failed", Toast.LENGTH_SHORT).show();
+                        Toasty.error(MainActivity.this, "CONNECTION FAILED!").show();
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -92,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
-                Toast.makeText(MainActivity.this, "Welcome " + account.getEmail() + "--" + account.getDisplayName() + "!", Toast.LENGTH_SHORT).show();
+                Toasty.success(MainActivity.this, "Login Successful!").show();
             } else {
-                Toast.makeText(MainActivity.this, "Auth Failed!", Toast.LENGTH_SHORT).show();
+                Toasty.error(MainActivity.this, "LOGIN FAILED!").show();
             }
         }
     }
@@ -110,8 +110,7 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                         } else {
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toasty.error(MainActivity.this, "AUTHENTICATION FAILED").show();
                         }
                     }
                 });

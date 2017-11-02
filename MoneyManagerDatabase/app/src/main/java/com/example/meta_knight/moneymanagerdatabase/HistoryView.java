@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import com.google.firebase.firestore.*;
+import es.dmoral.toasty.Toasty;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -47,7 +48,7 @@ public class HistoryView extends AppCompatActivity {
             InitializeContentView();
             ShowAllHistory();
         } else {
-            Toast.makeText(this, "Found Null Bundle", Toast.LENGTH_SHORT).show();
+            Toasty.error(HistoryView.this, "FOUND NULL BUNDLE!").show();
         }
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavView);
@@ -104,7 +105,7 @@ public class HistoryView extends AppCompatActivity {
                         TempMovie = new Movie(i.getString("title"), i.getString("ownerEmail"), MainDateFormat.format(ExpenseDate) + "\n" + i.getString("type").toUpperCase());
                         movieList.add(TempMovie);
                     } else {
-                        Toast.makeText(HistoryView.this, "GOT SOME NULL VALUES", Toast.LENGTH_SHORT).show();
+                        Toasty.error(HistoryView.this, "GOT SOME NULL VALUES").show();
                     }
                 }
                 if (!movieList.isEmpty()) {

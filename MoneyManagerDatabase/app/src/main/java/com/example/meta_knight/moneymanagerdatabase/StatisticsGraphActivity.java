@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.firebase.firestore.*;
+import es.dmoral.toasty.Toasty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class StatisticsGraphActivity extends AppCompatActivity {
             GlobalUID = bundleExtra.getString("uid");
             GlobalEmail = bundleExtra.getString("email");
         } else {
-            Toast.makeText(this, "Found Null Bundle", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "FOUND NULL BUNDLE").show();
         }
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavView);
@@ -127,13 +128,6 @@ public class StatisticsGraphActivity extends AppCompatActivity {
         PieDataSet pieDataSet = new PieDataSet(TempYEntry, "");
         pieDataSet.setSliceSpace(2);
         pieDataSet.setValueTextSize(12);
-
-        /*ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(Color.parseColor("#FF4B7C"));
-        colors.add(Color.parseColor("#FFC66B"));
-        colors.add(Color.parseColor("#54E040"));
-        colors.add(Color.parseColor("#22CAFC"));
-        colors.add(Color.parseColor("#4279ED"));*/
         pieDataSet.setColors(colors);
 
         PieData pieData = new PieData(pieDataSet);

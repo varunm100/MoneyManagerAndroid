@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.hash.Hashing;
 import com.google.firebase.firestore.*;
 import com.google.firebase.firestore.EventListener;
+import es.dmoral.toasty.Toasty;
 
 import javax.microedition.khronos.opengles.GL;
 import java.nio.charset.StandardCharsets;
@@ -65,12 +66,13 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
             email = bundle.getString("email");
         } else {
             Toast.makeText(this, "Got Null Bundle", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "GOT NULL BUNDLE!").show();
         }
         InitiateRecylerView();
         if (uid != null && GlobalCompCUID != null) {
             AddListenerSnapshot();
         } else {
-            Log.wtf("UIDGLOBAL", "VALUE NULL NOOOO");
+            Toasty.error(this, "SOMETHING WENT WRONG!").show();
         }
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavView);
@@ -151,7 +153,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                                         AddItems(ViewItems);
                                     }
                                 } else {
-                                    Toast.makeText(CompanyDash.this, "ERROR WHILE GETTING DATA", Toast.LENGTH_SHORT).show();
+                                    Toasty.error(CompanyDash.this, "ERROR WHILE GETTING DATA").show();
                                 }
                             }
                         }
@@ -160,7 +162,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(CompanyDash.this, "Error While trying to get User Data", Toast.LENGTH_SHORT).show();
+                    Toasty.error(CompanyDash.this, "ERROR WHILE GETTING USER DATA").show();
                 }
             });
         }
@@ -214,6 +216,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Company Expenses");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         recyclerView = findViewById(R.id.recycler_view);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
@@ -262,7 +265,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                         } else if (mSpinnerRef.getSelectedItem().toString() == "not paid") {
                             ChangeStatus(ItemSelected.getEid(), -1.0d);
                         } else {
-                            Toast.makeText(CompanyDash.this, "UNABLE TO CHANGE STATUS", Toast.LENGTH_SHORT).show();
+                            Toasty.error(CompanyDash.this, "UNABLE TO CHANGE STATUS").show();
                         }
                     }
                 });
@@ -275,6 +278,23 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
             }
         }));
         recyclerView.getLayoutManager().setMeasurementCacheEnabled(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                GotoMainActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void GotoMainActivity() {
+        Intent GotoMainAcivity = new Intent(CompanyDash.this, MainActivity.class);
+        GotoMainAcivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(GotoMainAcivity);
     }
 
     Map<String, Object> InputDataDocFoo = new HashMap<>();
@@ -323,7 +343,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
             @Override
             public void onSuccess(final DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.getDouble("status") == NewStatusIn) {
-                    Toast.makeText(CompanyDash.this, "No Changes Made", Toast.LENGTH_SHORT).show();
+                    Toasty.info(CompanyDash.this, "No Changes Made").show();
                     return;
                 }
                 InputDataDocFoo = documentSnapshot.getData();
@@ -334,12 +354,12 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                         mDocRefStatus.update("status", NewStatus).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(CompanyDash.this, "Updated Expense Status", Toast.LENGTH_SHORT).show();
+                                Toasty.success(CompanyDash.this, "Updated Expense Status!").show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(CompanyDash.this, "FAILED TO UPDATE EXPENSE STATUS", Toast.LENGTH_SHORT).show();
+                                Toasty.error(CompanyDash.this, "FAILED TO UPDATE EXPENSE STATUS").show();
                             }
                         });
 
@@ -361,7 +381,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(CompanyDash.this, "FAILED TO ADD EDIT", Toast.LENGTH_SHORT).show();
+                                Toasty.error(CompanyDash.this, "FAILED TO ADD EDIT TO HISTORY").show();
                             }
                         });
                     }
@@ -445,7 +465,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(CompanyDash.this, "Exit Clicked.", Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -482,7 +502,7 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     Date TodayDate = Calendar.getInstance().getTime();
                     CreateExpense(Double.parseDouble(ExpensePriceFinal), ExpenseDescFinal, ExpenseNameFinal, CategoryMainCreate, TodayDate, GlobalCompCUID, MainStatusSpinner);
                 } else {
-                    Toast.makeText(CompanyDash.this, "Expense Could NOT be created Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
+                    Toasty.info(CompanyDash.this, "No changes Made").show();
                 }
             }
         });
@@ -526,12 +546,12 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     mDocExpenseRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(CompanyDash.this, "Created New Expense!", Toast.LENGTH_SHORT).show();
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(CompanyDash.this, "FAILED to create new Expense!", Toast.LENGTH_SHORT).show();
+                            Toasty.error(CompanyDash.this, "FIALED TO CREATE NEW EXPENSE!").show();
                         }
                     });
                     Calendar calen = Calendar.getInstance();
@@ -540,25 +560,25 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     mDocExpenseData.put("type", "append");
                     mDocExpenseData.put("date", ExpDate.toString());
                     mDocExpenseData.put("expName", TitleExp);
-                            mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(CompanyDash.this, "Added Data in History", Toast.LENGTH_SHORT).show();
+                            Toasty.success(CompanyDash.this, "Created New Expense!").show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(CompanyDash.this, "Failed to add Data to history", Toast.LENGTH_SHORT).show();
+                            Toasty.error(CompanyDash.this, "FAILED TO ADD DAT TO HISTORY").show();
                         }
                     });
                 } else {
-                    Toast.makeText(CompanyDash.this, "Expense Already Exists!", Toast.LENGTH_SHORT).show();
+                    Toasty.error(CompanyDash.this, "EXPENSE ALREADY EXISTS!").show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(CompanyDash.this, "FAILED to Create New Expense", Toast.LENGTH_SHORT).show();
+                Toasty.error(CompanyDash.this, "FAILED TO CREATE EXPENSE").show();
             }
         });
     }
@@ -613,37 +633,36 @@ public class CompanyDash extends AppCompatActivity implements RecyclerItemTouchH
                     mDocExpenseData.put("type", "delete");
                     mDocExpenseData.put("date", TodayDate.toString());
                     mDocExpenseData.put("expName", TitleExpD);
-                            mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mDocRef.set(mDocExpenseData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(CompanyDash.this, "Added Data in History", Toast.LENGTH_SHORT).show();
                             DocumentReference mDocRefDeleteDocument = FirebaseFirestore.getInstance().document("companies/" + GlobalCompCUID + "/expenses/" + CompletedDeleteEID);
                             mDocRefDeleteDocument.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Toast.makeText(CompanyDash.this, "Deleted Expense!", Toast.LENGTH_SHORT).show();
+                                    Toasty.success(CompanyDash.this, "Deleted Expense!").show();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(CompanyDash.this, "ERROR WHILE DELETING EXPENSE!", Toast.LENGTH_SHORT).show();
+                                    Toasty.error(CompanyDash.this, "ERROR WHILE DELETING EXPENSE!").show();
                                 }
                             });
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(CompanyDash.this, "Failed to add Data to history", Toast.LENGTH_SHORT).show();
+                            Toasty.error(CompanyDash.this, "FAILED TO ADD DATA TO HISTORY!").show();
                         }
                     });
                 } else {
-                    Toast.makeText(CompanyDash.this, "ERROR While trying to delete expense", Toast.LENGTH_SHORT).show();
+                    Toasty.error(CompanyDash.this, "ERROR WHILE DELETING EXPENSE").show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(CompanyDash.this, "ERROR WHILE ADDING TO HISTORY", Toast.LENGTH_SHORT).show();
+                Toasty.error(CompanyDash.this, "ERROR WHILE ADDING DATA TO HISTORY").show();
             }
         });
     }

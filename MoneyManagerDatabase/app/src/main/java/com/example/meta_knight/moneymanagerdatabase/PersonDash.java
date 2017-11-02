@@ -22,11 +22,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.hash.Hashing;
 import com.google.firebase.firestore.*;
 import com.google.firebase.firestore.EventListener;
+import es.dmoral.toasty.Toasty;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -42,6 +44,9 @@ public class PersonDash extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MoviesAdapter mAdapter;
 
+    com.github.clans.fab.FloatingActionMenu materialDesignFAM;
+    com.github.clans.fab.FloatingActionButton floatingActionButton1, floatingActionButton2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,14 +59,32 @@ public class PersonDash extends AppCompatActivity {
             name = bundle.getString("name");
             uid = bundle.getString("uid");
             PhotoURL = bundle.getString("PhotoURL");
-            Toast.makeText(PersonDash.this, email + "---" + name + "---" + uid, Toast.LENGTH_LONG).show();
+            //Toast.makeText(PersonDash.this, email + "---" + name + "---" + uid, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(PersonDash.this, "Got Null Bundle", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(PersonDash.this, "Got Null Bundle", Toast.LENGTH_SHORT).show();
         }
         UserExist(uid);
 
         InitializeContentView();
         AddSnapListener();
+        SetupExpandableButton();
+    }
+
+    private void SetupExpandableButton() {
+        materialDesignFAM = findViewById(R.id.material_design_android_floating_action_menu);
+        floatingActionButton1 = findViewById(R.id.material_design_floating_action_menu_item1);
+        floatingActionButton2 = findViewById(R.id.material_design_floating_action_menu_item2);
+
+        floatingActionButton1.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                CreateCompanyClicked(v);
+            }
+        });
+        floatingActionButton2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                JoinCompanyClicked(v);
+            }
+        });
     }
 
     private void AddSnapListener() {
@@ -158,12 +181,13 @@ public class PersonDash extends AppCompatActivity {
         mDocDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(PersonDash.this, "Deleted Company User Instance", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(PersonDash.this, "Deleted Company User Instance", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(PersonDash.this, "FAILED TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+                Toasty.error(PersonDash.this, "FAILED TO DELETE COMAPNY").show();
+                return;
             }
         });
 
@@ -171,12 +195,13 @@ public class PersonDash extends AppCompatActivity {
         mDocDeleteCompRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(PersonDash.this, "Deleted Company!", Toast.LENGTH_SHORT).show();
+                //Toasty.success(PersonDash.this, "Deleted Company!").show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(PersonDash.this, "FAILED TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+                Toasty.error(PersonDash.this, "FAILED TO DELETE COMPANY").show();
+                return;
             }
         });
 
@@ -195,7 +220,8 @@ public class PersonDash extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(PersonDash.this, "UNABLE TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+                            Toasty.error(PersonDash.this, "UNABLE TO DELETE COMPANY").show();
+                            return;
                         }
                     });
                 }
@@ -203,7 +229,8 @@ public class PersonDash extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(PersonDash.this, "UNABLE TO DELETE COMPANY", Toast.LENGTH_SHORT).show();
+                Toasty.error(PersonDash.this, "UNABLE TO DELETE COMPANY").show();
+                return;
             }
         });
     }
@@ -223,12 +250,12 @@ public class PersonDash extends AppCompatActivity {
         aDocRef.set(UserData).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(PersonDash.this, "Added New User!", Toast.LENGTH_SHORT).show();
+                Toasty.success(PersonDash.this, "Added New User To Database!").show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(PersonDash.this, "FAILED TO ADD USER!!!", Toast.LENGTH_SHORT).show();
+                Toasty.error(PersonDash.this, "FAILED TO ADD NEW USER").show();
             }
         });
 
@@ -238,12 +265,12 @@ public class PersonDash extends AppCompatActivity {
         aCollRef.set(EmptyCompany).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(PersonDash.this, "Added Null Company", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(PersonDash.this, "Added Null Company", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(PersonDash.this, "FAILED TO ADD NULL COMPANY", Toast.LENGTH_LONG).show();
+                //Toast.makeText(PersonDash.this, "FAILED TO ADD NULL COMPANY", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -265,12 +292,13 @@ public class PersonDash extends AppCompatActivity {
                     CompanyRef.set(CompanyDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(PersonDash.this, "Created cname and CID", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(PersonDash.this, "Created cname and CID", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(PersonDash.this, "FAILED to Create cname and CID", Toast.LENGTH_SHORT).show();
+                            Toasty.error(PersonDash.this, "FAILED TO CREATE COMPANY").show();
+                            return;
                         }
                     });
                     DocumentReference ListPeople = FirebaseFirestore.getInstance().document("companies/" + CompanyUserId + "/people/" + uid);
@@ -282,12 +310,12 @@ public class PersonDash extends AppCompatActivity {
                     ListPeople.set(PersonAdd).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(PersonDash.this, "Created people Collection", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(PersonDash.this, "Created people Collection", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(PersonDash.this, "FAILED TO create people collection", Toast.LENGTH_LONG).show();
+                            Toasty.error(PersonDash.this, "FAILED TO CREATE COMPANY").show();
                         }
                     });
 
@@ -299,18 +327,17 @@ public class PersonDash extends AppCompatActivity {
                     addCompanyList.set(AddPersonList).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(PersonDash.this, "Added Company Collection", Toast.LENGTH_SHORT).show();
+                            Toasty.success(PersonDash.this, "Created Company!").show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(PersonDash.this, "FAILED TO ADD COMPANY COLLECTION", Toast.LENGTH_SHORT).show();
+                            Toasty.error(PersonDash.this, "FAILED TO CREATE COMPANY").show();
                         }
                     });
 
-                    DocumentReference addCatList = FirebaseFirestore.getInstance().document("companies/categories");
+                    DocumentReference addCatList = FirebaseFirestore.getInstance().document("companies/"  + CompanyUserId + "/categories");
                     Map<String, Object> AddCatList = new HashMap<>();
-                    AddCatList.put("NumCat", "5");
                     AddCatList.put("1", "travel");
                     AddCatList.put("2", "food");
                     AddCatList.put("3", "software licenses");
@@ -319,12 +346,12 @@ public class PersonDash extends AppCompatActivity {
                     addCatList.set(AddCatList).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(PersonDash.this, "Added Category List!", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(PersonDash.this, "FAILED to create Category List", Toast.LENGTH_SHORT).show();
+                            return;
                         }
                     });
                 }
@@ -332,8 +359,8 @@ public class PersonDash extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
-                Toast.makeText(PersonDash.this, "Failed to Verify if document Exists", Toast.LENGTH_LONG).show();
+                Toasty.error(PersonDash.this, "Failed to Create Company").show();
+                return;
             }
         });
     }
@@ -346,7 +373,6 @@ public class PersonDash extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {
-                    Toast.makeText(PersonDash.this, "Company DOES NOT exist", Toast.LENGTH_SHORT).show();
                     DocumentReference addPersonCompany = FirebaseFirestore.getInstance().document("users/" + uid + "/companies/" + cuidTemp);
                     Map<String, Object> addPersonCompanyData = new HashMap<>();
                     addPersonCompanyData.put("cid", cuidTemp);
@@ -355,12 +381,13 @@ public class PersonDash extends AppCompatActivity {
                     addPersonCompany.set(addPersonCompanyData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(PersonDash.this, "Joined Compnay users/", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(PersonDash.this, "Joined Compnay users/", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(PersonDash.this, "FAILED TO JOIN COMPANY users/", Toast.LENGTH_SHORT).show();
+                            Toasty.error(PersonDash.this, "FAILED TO JOIN COMPANY").show();
+                            return;
                         }
                     });
 
@@ -373,23 +400,23 @@ public class PersonDash extends AppCompatActivity {
                     addCompanyPerson.set(addCompanyPersonMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(PersonDash.this, "Joined Company", Toast.LENGTH_SHORT).show();
+                            Toasty.success(PersonDash.this, "Joined Company!").show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(PersonDash.this, "FAILED TO JOIN COMPANY", Toast.LENGTH_SHORT).show();
+                            Toasty.error(PersonDash.this, "FAILED TO JOIN COMPANY").show();
                         }
                     });
                 } else {
-                    Toast.makeText(PersonDash.this, "Company Does NOT EXIST", Toast.LENGTH_SHORT).show();
+                    Toasty.error(PersonDash.this, "COMPANY DOES NOT EXIST").show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 e.printStackTrace();
-                Toast.makeText(PersonDash.this, "FAILED to Create Company", Toast.LENGTH_SHORT).show();
+                Toasty.error(PersonDash.this, "FAILED TO JOIN COMPANY").show();
             }
         });
     }
@@ -400,9 +427,9 @@ public class PersonDash extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {
-                    Toast.makeText(PersonDash.this, "User Exists!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(PersonDash.this, "User Exists!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(PersonDash.this, "User DOES NOT Exists!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(PersonDash.this, "User DOES NOT Exists!", Toast.LENGTH_SHORT).show();
                     CreateUser(uid, email, name, PhotoURL);
                 }
             }
@@ -422,7 +449,7 @@ public class PersonDash extends AppCompatActivity {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Create New Company");
         alert.setView(AlertLayout);
-        alert.setCancelable(false);
+        alert.setCancelable(true);
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -437,7 +464,7 @@ public class PersonDash extends AppCompatActivity {
                 if (CompNameFinalStr.trim().length() > 0) {
                     CreateCompany(CompNameFinalStr);
                 } else {
-                    Toast.makeText(PersonDash.this, "Company Could NOT be created Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
+                    Toasty.info(PersonDash.this, "Please Enter Non-Whitespace Text").show();
                 }
             }
         });
@@ -468,7 +495,7 @@ public class PersonDash extends AppCompatActivity {
                 if (CompId.trim().length() > 0) {
                     JoinCompany(CompId);
                 } else {
-                    Toast.makeText(PersonDash.this, "Company Could NOT be created Please Enter Something other then whitespace", Toast.LENGTH_LONG).show();
+                    Toasty.info(PersonDash.this, "Please Enter Non-Whitespace Text").show();
                 }
             }
         });
